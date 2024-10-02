@@ -1,0 +1,20 @@
+@media screen  and (max-width: 956px){
+    .barchart{
+        width: 50%;
+    }
+    
+}
+
+@media screen  and (max-width: 500px){
+    .barchart{
+        width: 40%;
+    }
+    
+}
+
+@media screen  and (max-width: 451px){
+    .barchart{
+        width: 30%;
+    }
+    
+}

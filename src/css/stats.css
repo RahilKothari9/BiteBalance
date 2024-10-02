@@ -1,0 +1,7 @@
+
+@media screen  and (max-width: 850px){
+    .bottom-chart{
+        display: flex;
+        flex-direction: column;
+    }
+}
