@@ -6,12 +6,8 @@ import PeopleIcon from '@mui/icons-material/People';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
 
 const Recipe = (props) => {
-    let rec = props.recipe
-    
-    let resultString
-    if (rec.startsWith('```json') && rec.endsWith('```')) {
-        resultString = rec.substring('```json'.length, rec.length - '```'.length);}
-    let recipe = JSON.parse(resultString)
+
+    let recipe = props.recipe
     console.log(recipe)
     const recipeData = {
         title: "Delicious Recipe",

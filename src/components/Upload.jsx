@@ -142,7 +142,7 @@ export default function Upload(props) {
     const base64Image = image.toString("base64");
     //console.log(base64Image)
     try {
-       const response = await fetch('https://BiteBalance.vercel.app/generate-ingredients', {
+       const response = await fetch('http://localhost:3000/generate-ingredients', {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',
