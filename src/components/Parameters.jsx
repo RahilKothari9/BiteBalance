@@ -43,7 +43,7 @@ export default function Parameters(props) {
   const generateRecipe = async () => {
     props.setOpen(true)
     try {
-       const response = await fetch('http://localhost:3000/generate-recipe', {
+       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}generate-recipe`, {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',

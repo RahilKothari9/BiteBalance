@@ -92,13 +92,14 @@ export default function CopyUpload() {
     console.log("HI1")
     if (!image) {
        alert('Please select an image first.');
+       props.setOpen(false);
        return;
     }
     
     const base64Image = image.toString("base64");
     //console.log(base64Image)
     try {
-       const response = await fetch('http://localhost:3000/generate-ingredients', {
+       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}generate-ingredients`, {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',

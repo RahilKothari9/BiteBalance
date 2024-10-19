@@ -134,6 +134,7 @@ export default function NewUpload(props) {
     props.setOpen(true)
     if (!props.image) {
        alert('Please select an image first.');
+       props.setOpen(false);
        return;
     }
     props.setImage(props.image)
@@ -141,7 +142,7 @@ export default function NewUpload(props) {
     const base64Image = props.image.toString("base64");
     //console.log(base64Image)
     try {
-       const response = await fetch('http://localhost:3000/generate-info', {
+       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}generate-info`, {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',
