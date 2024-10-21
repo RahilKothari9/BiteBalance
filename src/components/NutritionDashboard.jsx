@@ -16,12 +16,12 @@ const Dashboard = ({ userId }) => {
       if (response.data) {
         const { totalCalories, totalProtein, totalCarbs, totalSodium, totalSugars, totalFats } = response.data;
         setNutritionStats([
-          { name: 'Calories', value: totalCalories, icon: <FitnessCenter />, color: 'red', max: 2000 },
-          { name: 'Proteins', value: totalProtein, icon: <Restaurant />, color: 'purple', max: 100 },
-          { name: 'Carbs', value: totalCarbs, icon: <Fastfood />, color: 'yellow', max: 300 },
-          { name: 'Sodium', value: totalSodium, icon: <WaterDrop />, color: 'blue', max: 2300 },
-          { name: 'Sugars', value: totalSugars, icon: <Icecream />, color: 'pink', max: 50 },
-          { name: 'Fats', value: totalFats, icon: <Apple />, color: 'green', max: 80 },
+          { name: 'Calories', value: totalCalories, icon: <FitnessCenter />, color: 'red', max: 3000 },
+          { name: 'Proteins', value: totalProtein, icon: <Restaurant />, color: 'purple', max: 500 },
+          { name: 'Carbs', value: totalCarbs, icon: <Fastfood />, color: 'yellow', max: 600 },
+          { name: 'Sodium', value: totalSodium, icon: <WaterDrop />, color: 'blue', max: 4300 },
+          { name: 'Sugars', value: totalSugars, icon: <Icecream />, color: 'pink', max: 150 },
+          { name: 'Fats', value: totalFats, icon: <Apple />, color: 'green', max: 180 },
         ]);
       }
 
@@ -50,11 +50,11 @@ const Dashboard = ({ userId }) => {
   }, [userId]);
 
   return (
-    <Box maxWidth="lg" mx="auto" p={4}>
+    <Box maxWidth="lg" mx="auto" p={10}>
       {/* Nutrition Stats Card */}
       <Card  mt={14}>
         <CardContent>
-          <Typography variant="h5" component="div" gutterBottom mt={6}>
+          <Typography variant="h5" component="div" gutterBottom >
             Your Nutrition Today
           </Typography>
           <Grid container spacing={3} >
