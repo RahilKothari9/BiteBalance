@@ -33,13 +33,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed z-30 w-full bg-primary-100 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <nav className="fixed z-30 w-full bg-white border-b border-gray-200">
       <div className="px-3 py-3 lg:px-5 lg:pl-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-start">
             <a href="/" className="flex flex-row items-center ml-2 md:mr-24">
               <img src={Logo} className="h-8 mr-3" alt="Logo" />
-              <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
+              <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-gray-800">
                 BiteBalance
               </span>
             </a>
@@ -48,7 +48,7 @@ const Navbar = () => {
           <div className="flex items-center ml-3 relative">
             <button
               type="button"
-              className="flex text-sm rounded-full focus:ring-4"
+              className="flex text-sm rounded-full focus:ring-4 focus:ring-gray-300"
               onClick={handleToggleDropdown}
             >
               <span className="sr-only">Open user menu</span>
@@ -59,11 +59,11 @@ const Navbar = () => {
               />
             </button>
             {isDropdownOpen && (
-              <ul className="absolute right-0 mt-2 space-y-2 bg-white border dark:bg-gray-800 dark:border-gray-700 ring-1 ring-black ring-opacity-5 shadow-lg min-w-max mt-40">
+              <ul className="absolute right-0 mt-2 space-y-2 bg-white border border-gray-200 rounded-md shadow-lg min-w-max mt-40">
                 <li>
                   <a
                     href="/profile"
-                    className="block px-4 py-2 text-sm text-primary-700 hover:bg-primary-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     role="menuitem"
                   >
                     Profile
@@ -72,7 +72,7 @@ const Navbar = () => {
                 <li>
                   <button
                     onClick={handleSignOut}
-                    className="block w-full px-4 py-2 text-sm text-primary-700 hover:bg-primary-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                    className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left"
                     role="menuitem"
                   >
                     Sign Out
