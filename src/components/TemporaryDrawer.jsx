@@ -11,7 +11,7 @@ import { Button } from '@mui/material';
 import axios from 'axios';  // Use axios for API calls
 import '../css/drawer.css';
 import { UserAuth } from '../contexts/AuthContext';
-const drawerBleeding = 56;
+const drawerBleeding = 50;
 
 const Root = styled('div')(({ theme }) => ({
   height: '100%',
@@ -97,31 +97,33 @@ function SwipeableEdgeDrawer(props) {
         }}
       />
       
-      <div className='flex flex-col align-center justify-center image-show'>
-        <img src={props.image} style={{"height":"350px", "margin": "auto", "marginTop":"2em"}}/>
-        <h1>{recipe.name}</h1>
+      <div className='flex flex-col items-center justify-center w-full p-4'>
+        <img src={props.image} className="h-64 mt-4 mb-4 object-cover" alt={recipe.name} />
+        <h1 className="text-2xl font-bold mb-4">{recipe.name}</h1>
         <Button 
-  onClick={() => {
-    const caloriesAsNumber = parseFloat(recipe.calories);
-    const proteinAsNumber = parseFloat(recipe.protein);
-    const sugarAsNumber = parseFloat(recipe.sugars);
-    const carbsAsNumber = parseFloat(recipe.carbs);
-    const fatAsNumber = parseFloat(recipe.fats);
-    const sodiumAsNumber = parseFloat(recipe.sodium);
+          onClick={() => {
+            const caloriesAsNumber = parseFloat(recipe.calories);
+            const proteinAsNumber = parseFloat(recipe.protein);
+            const sugarAsNumber = parseFloat(recipe.sugars);
+            const carbsAsNumber = parseFloat(recipe.carbs);
+            const fatAsNumber = parseFloat(recipe.fats);
+            const sodiumAsNumber = parseFloat(recipe.sodium);
 
-    updateTotalCalories(userId, caloriesAsNumber, proteinAsNumber, sugarAsNumber, carbsAsNumber, fatAsNumber, sodiumAsNumber);
-  }}
->
-  Eat
-</Button>
+            updateTotalCalories(userId, caloriesAsNumber, proteinAsNumber, sugarAsNumber, carbsAsNumber, fatAsNumber, sodiumAsNumber);
+          }}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Eat
+        </Button>
       </div>
-      
+      <div>
       <SwipeableDrawer
         container={container}
         anchor="bottom"
         open={open}
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
+        onClick={toggleDrawer(true)}
         swipeAreaWidth={drawerBleeding}
         disableSwipeToOpen={false}
         ModalProps={{
@@ -151,21 +153,22 @@ function SwipeableEdgeDrawer(props) {
             overflow: 'auto',
             backgroundColor: '#FFFFCC'
           }}
-          className='bg-primary-100 flex flex-col justify-center contents-center items-center'
+          className='bg-primary-100 flex flex-col justify-center items-center'
         >
-          <h1 className='font-bold underline-offset-4'>Per 100 grams:</h1>
+          {/* <h1 className='font-bold underline mb-4'>Per 100 grams:</h1> */}
           
-          <ul>
-            <li>Calories: {recipe.calories}</li>
-            <li>Protein: {recipe.protein} g</li>
-            <li>Carbs: {recipe.carbs} g</li>
-            <li>Sugars: {recipe.sugars} g</li>
-            <li>Fats: {recipe.fats} g</li>
-            <li>Sodium: {recipe.sodium} mg</li>
+          <ul className="list-disc pl-5">
+            <li className="mb-2 text-2xl">Calories: {recipe.calories}</li>
+            <li className="mb-2 text-2xl">Protein: {recipe.protein} g</li>
+            <li className="mb-2 text-2xl">Carbs: {recipe.carbs} g</li>
+            <li className="mb-2 text-2xl">Sugars: {recipe.sugars} g</li>
+            <li className="mb-2 text-2xl">Fats: {recipe.fats} g</li>
+            <li className="mb-2 text-2xl">Sodium: {recipe.sodium} mg</li>
           </ul>
           
         </StyledBox>
       </SwipeableDrawer>
+      </div>
     </Root>
   );
 }
