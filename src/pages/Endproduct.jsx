@@ -100,7 +100,7 @@ export default function Endproduct() {
       <Stepper activeStep={activeStep} size="lg"
       
      
-      sx={{ '& .MuiStepLabel-label': { fontSize: '1.5rem' }, '& .MuiStepIcon-root': { fontSize: '1.5rem' } }}
+      sx={{ '& .MuiStepLabel-label': { fontSize: '2.9vmin' }, '& .MuiStepIcon-root': { fontSize: '2.9vmin' } }}
       >
         {steps.map((label, index) => {
           const stepProps = {sx: { fontSize: 5 }};

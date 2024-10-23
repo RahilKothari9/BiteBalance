@@ -127,7 +127,7 @@ export default function NewUpload(props) {
       }
     }
   };
-  //   const [image, setImage] = useState(null);
+  // const [image, setImage] = useState(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -188,7 +188,7 @@ export default function NewUpload(props) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="h-90 flex mt-5 justify-center">
       <div className="w-full max-w-7xl p-10 bg-white rounded-xl shadow-xl flex">
         <div className="w-1/2 pr-8">
           <h1 className="text-4xl font-bold text-green-800 mb-4">
@@ -201,8 +201,26 @@ export default function NewUpload(props) {
               FIND OUT INGREDIENTS AND CALORIES IN AN INSTANT WITH A PHOTO
             </p>
           </div>
+          {props.image && (
+            <div className="bg-gray-100 rounded-lg p-6 mt-6 flex flex-col items-center justify-center gap-5">
+              {" "}
+              {/* Increase margin-top with mt-6 */}
+              <img
+                src={props.image}
+                alt="Uploaded"
+                className="mt-4 max-w-full max-h-48 rounded shadow-md"
+              />
+              <Button
+                variant="contained"
+                className="mt-6 bg-green-500 hover:bg-green-600 px-6 py-3 text-base"
+                onClick={handleUploadClick}
+              >
+                Upload
+              </Button>
+            </div>
+          )}
         </div>
-
+        `
         <div
           className="w-1/2 bg-blue-50 rounded-xl p-8 flex flex-col items-center justify-center"
           onDragOver={handleDragOver}
@@ -223,13 +241,14 @@ export default function NewUpload(props) {
             onChange={handleImageChange}
             accept=".jpg, .jpeg, .png"
           />
-          <div className="flex space-x-4">
+          <div className="flex flex-col align-center justify-center  gap-4">
             <Button
               variant="contained"
               component="label"
               htmlFor="fileInput"
               startIcon={<CloudUploadIcon />}
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-blue-500 hover:bg-blue-600 "
+              sx={{ width:"100%"}}
             >
               Select Files
             </Button>
@@ -239,6 +258,7 @@ export default function NewUpload(props) {
               className="border-blue-500 text-blue-500 hover:bg-blue-50"
               onClick={handleCaptureClick}
               disabled={isCapturing}
+              sx={{ width:"100%"}}
             >
               Capture Image
             </Button>
@@ -274,7 +294,7 @@ export default function NewUpload(props) {
                 playsInline
                 className="mt-4 max-w-full max-h-48 rounded shadow-md"
               />
-              <div className="flex mt-2">
+              <div className="flex mt-2 flex gap-2">
                 <Button
                   onClick={handleCaptureImage}
                   className="bg-green-500 text-white text-xs px-2 py-1 rounded mt-2"
