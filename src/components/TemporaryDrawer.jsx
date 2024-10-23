@@ -97,7 +97,7 @@ function SwipeableEdgeDrawer(props) {
         }}
       />
       
-      <div className='flex flex-col items-center justify-center w-full p-4'>
+      <div className='flex flex-col items-center justify-center w-90 p-4 mt-4 bg-blue-50'>
         <img src={props.image} className="h-64 mt-4 mb-4 object-cover" alt={recipe.name} />
         <h1 className="text-2xl font-bold mb-4">{recipe.name}</h1>
         <Button 
@@ -116,7 +116,7 @@ function SwipeableEdgeDrawer(props) {
           Eat
         </Button>
       </div>
-      <div>
+      <div onClick={toggleDrawer(!open)}>
       <SwipeableDrawer
         container={container}
         anchor="bottom"
@@ -124,6 +124,7 @@ function SwipeableEdgeDrawer(props) {
         onClose={toggleDrawer(false)}
         onOpen={toggleDrawer(true)}
         onClick={toggleDrawer(true)}
+      
         swipeAreaWidth={drawerBleeding}
         disableSwipeToOpen={false}
         ModalProps={{
@@ -153,17 +154,17 @@ function SwipeableEdgeDrawer(props) {
             overflow: 'auto',
             backgroundColor: '#FFFFCC'
           }}
-          className='bg-primary-100 flex flex-col justify-center items-center'
+          className='bg-blue-50 flex flex-col justify-center items-center'
         >
           {/* <h1 className='font-bold underline mb-4'>Per 100 grams:</h1> */}
           
           <ul className="list-disc pl-5">
-            <li className="mb-2 text-2xl">Calories: {recipe.calories}</li>
-            <li className="mb-2 text-2xl">Protein: {recipe.protein} g</li>
-            <li className="mb-2 text-2xl">Carbs: {recipe.carbs} g</li>
-            <li className="mb-2 text-2xl">Sugars: {recipe.sugars} g</li>
-            <li className="mb-2 text-2xl">Fats: {recipe.fats} g</li>
-            <li className="mb-2 text-2xl">Sodium: {recipe.sodium} mg</li>
+            <li className="mb-2 text-2xl sm:text-xl">Calories: {recipe.calories}</li>
+            <li className="mb-2 text-2xl sm:text-xl">Protein: {recipe.protein} g</li>
+            <li className="mb-2 text-2xl sm:text-xl">Carbs: {recipe.carbs} g</li>
+            <li className="mb-2 text-2xl sm:text-xl">Sugars: {recipe.sugars} g</li>
+            <li className="mb-2 text-2xl sm:text-xl">Fats: {recipe.fats} g</li>
+            <li className="mb-2 text-2xl sm:text-xl">Sodium: {recipe.sodium} mg</li>
           </ul>
           
         </StyledBox>
