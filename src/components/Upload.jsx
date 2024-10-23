@@ -154,13 +154,16 @@ export default function Upload(props) {
    
        if (!response.ok) {
          throw new Error('Network response was not ok');
+         return;
        }
    
-       const ings = await response.text();
+       const ings = await response.json();
        console.log(ings)
-       if(ings === " ERROR")
+       if(ings === " ERROR" || ings.ingredients.length == 0)
        {
         alert('Failed to generate ingredients. Please upload another image.');
+        props.setOpen(false);
+        return;
        }
       //  else
       //  {
