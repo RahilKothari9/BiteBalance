@@ -19,6 +19,7 @@ const style = {
   bgcolor: 'transparent',
   p: 2,
   pl: 20,
+  
 };
 
 const steps = ['Take a Photo', 'Count your Calories!'];
@@ -95,11 +96,15 @@ export default function Endproduct() {
     />
         </Box>
       </Modal>
-    <Box sx={{ width: '100%', pt:10}}>
-      <Stepper activeStep={activeStep}>
+    <Box sx={{ width: '95%', pt:10, margin:"auto" }}>
+      <Stepper activeStep={activeStep} size="lg"
+      
+     
+      sx={{ '& .MuiStepLabel-label': { fontSize: '1.5rem' }, '& .MuiStepIcon-root': { fontSize: '1.5rem' } }}
+      >
         {steps.map((label, index) => {
-          const stepProps = {};
-          const labelProps = {};
+          const stepProps = {sx: { fontSize: 5 }};
+          const labelProps = { sx: { fontSize: 5 } }; // Increase font size
           if (isStepOptional(index)) {
             labelProps.optional = (
               <Typography variant="caption">Optional</Typography>
@@ -110,7 +115,7 @@ export default function Endproduct() {
           }
           return (
             <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
+              <StepLabel {...labelProps} sx={{fontSize: 20}}>{label}</StepLabel>
             </Step>
           );
         })}

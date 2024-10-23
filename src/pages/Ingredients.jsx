@@ -95,8 +95,10 @@ export default function Ingredients() {
           />
         </Box>
       </Modal>
-      <Box sx={{ width: "100%", pt: 10 }}>
-        <Stepper activeStep={activeStep}>
+      <Box sx={{ width: '95%', pt:10, margin:"auto" }}>
+        <Stepper activeStep={activeStep}
+          sx={{ '& .MuiStepLabel-label': { fontSize: '1.5rem' }, '& .MuiStepIcon-root': { fontSize: '1.5rem' } }}
+        >
           {steps.map((label, index) => {
             const stepProps = {};
             const labelProps = {};
