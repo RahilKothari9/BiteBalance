@@ -192,12 +192,12 @@ return (
       <section class="mx-auto flex max-w-5xl flex-col items-center gap-2 py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-20">
         <h1 class="text-center p-8 md:p-8 text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
           Say goodbye to mealtime indecision with
-          <span class="bg-gradient-to-r from-primary-900 to-primary-600 bg-clip-text text-transparent">
+          <span class="bg-gradient-to-r from-primary-900 to-primary-600 bg-clip-text text-green-800 ">
             {" "}
             BiteBalance
           </span>
         </h1>
-        <div class="text-center text-lg text-muted-foreground">
+        <div class="text-center text-2xl text-muted-foreground">
           Your Recipe generator
         </div>
       </section>
