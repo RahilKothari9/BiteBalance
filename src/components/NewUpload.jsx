@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
-import '../css/upload.css';
-
+import { Button } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CameraAltIcon from "@mui/icons-material/CameraAlt";
+import "../css/upload.css";
 
 export default function NewUpload(props) {
   const [dragActive, setDragActive] = useState(false);
@@ -8,7 +10,7 @@ export default function NewUpload(props) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [files, setFiles] = useState([]);
-  const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  const allowedFileTypes = ["image/jpeg", "image/jpg", "image/png"];
   const [isCapturing, setIsCapturing] = useState(false);
 
   function handleChange(e) {
@@ -72,35 +74,43 @@ export default function NewUpload(props) {
   }
   const handleCaptureClick = async () => {
     try {
-       setIsCapturing(true);
-       let constraints = { video: true };
-   
-       // Check if there are multiple video input devices
-       const devices = await navigator.mediaDevices.enumerateDevices();
-       const videoInputDevices = devices.filter(device => device.kind === 'videoinput');
+      setIsCapturing(true);
+      let constraints = { video: true };
+
+      // Check if there are multiple video input devices
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoInputDevices = devices.filter(
+        (device) => device.kind === "videoinput"
+      );
       //alert(videoInputDevices.length)
-       if (videoInputDevices.length > 0) {
-         // If there are multiple video input devices, prefer the rear camera
-         constraints.video = { facingMode: 'environment' };
-       } else {
-         // If there's only one video input device, assume it's a laptop and use the front camera
-         constraints.video = { facingMode: 'user' };
-       }
-   
-       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-       if (videoRef.current) {
-         videoRef.current.srcObject = stream;
-       }
+      if (videoInputDevices.length > 0) {
+        // If there are multiple video input devices, prefer the rear camera
+        constraints.video = { facingMode: "environment" };
+      } else {
+        // If there's only one video input device, assume it's a laptop and use the front camera
+        constraints.video = { facingMode: "user" };
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
     } catch (error) {
-       console.error('Error accessing camera:', error);
+      console.error("Error accessing camera:", error);
     }
-   };
+  };
 
   const handleCaptureImage = () => {
     if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext('2d');
-      context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-      const imageDataURL = canvasRef.current.toDataURL('image/png');
+      const context = canvasRef.current.getContext("2d");
+      context.drawImage(
+        videoRef.current,
+        0,
+        0,
+        canvasRef.current.width,
+        canvasRef.current.height
+      );
+      const imageDataURL = canvasRef.current.toDataURL("image/png");
       props.setImage(imageDataURL);
       setIsCapturing(false);
     }
@@ -111,13 +121,13 @@ export default function NewUpload(props) {
       const stream = videoRef.current.srcObject;
       if (stream) {
         const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop());
+        tracks.forEach((track) => track.stop());
         videoRef.current.srcObject = null;
         setIsCapturing(false);
       }
     }
-  }
-//   const [image, setImage] = useState(null);
+  };
+  //   const [image, setImage] = useState(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -131,161 +141,157 @@ export default function NewUpload(props) {
   };
 
   const handleUploadClick = async () => {
-    props.setOpen(true)
+    props.setOpen(true);
     if (!props.image) {
-       alert('Please select an image first.');
-       props.setOpen(false);
-       return;
+      alert("Please select an image first.");
+      props.setOpen(false);
+      return;
     }
-    props.setImage(props.image)
-    
+    props.setImage(props.image);
+
     const base64Image = props.image.toString("base64");
     //console.log(base64Image)
     try {
-       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}generate-info`, {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({ b64: base64Image }),
-       });
-   
-       if (!response.ok) {
-         throw new Error('Network response was not ok');
-       }
-   
-       const ings = await response.text();
-       console.log(ings)
-       if(ings === " ERROR")
-       {
-        alert('Not a meal. Please upload another image.');
-       }
-        else{
-            props.setIng(ings)
-            props.setOpen(false)
-            props.handleNext()
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}generate-info`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ b64: base64Image }),
         }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const ings = await response.text();
+      console.log(ings);
+      if (ings === " ERROR") {
+        alert("Not a meal. Please upload another image.");
+      } else {
+        props.setIng(ings);
+        props.setOpen(false);
+        props.handleNext();
+      }
       //  {
       //   setIngredients(ings)
       //  }
-       // Move to next screen bro
+      // Move to next screen bro
       //  alert(`Ingredients: ${ings}`);
-      
     } catch (error) {
-       console.error('Error:', error);
-       alert('Failed to generate ingredients. Please upload another image.');
+      console.error("Error:", error);
+      alert("Failed to generate ingredients. Please upload another image.");
     }
-   };
-   
+  };
+
   return (
-    <div className="flex flex-col items-center justify-space  h-screen ">
-      <div className="flex flex-col items-center justify-space h-screen/2 ">
-      
-      </div>
-      <h1 class="text-center pt-8 md:p-8 text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl">
-          How Healthy is your food?
-      </h1>
-      <h2 className="text-center text-xl font-bold leading-tight tracking-tighter md:text-4xl lg:text-4xl">
-        Check it out!
-      </h2>
-      <div className="text-center mt-5 flex flex-col items-center h-screen  w-screen p">
-      <form 
-        className={`${
-          dragActive ? "bg-blue-400" : "bg-blue-100" 
-        } bg-primary-100 p-7 h-100 w-3/5 rounded-lg uploadImg form-upload text-center flex flex-col items-center justify-center`}
-        onDragEnter={handleDragEnter}
-        onSubmit={(e) => e.preventDefault()}
-        onDrop={handleDrop}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-      >
-        <input
-          placeholder="fileInput"
-          className="hidden"
-          ref={inputRef}
-          type="file"
-          multiple={true}
-          onChange={handleImageChange}
-          accept=".jpg"
-        />
-
-        <p>
-          Drag & Drop files or{" "}
-          <span
-            className="font-bold text-blue-600 cursor-pointer"
-            onClick={openFileExplorer}
-          >
-            <u>Select files</u>
-          </span>{" "}
-          to upload
-        </p>
-
-        <div className="flex flex-col items-center p-3">
-          {files.map((file, idx) => (
-            <div key={idx} className="flex flex-row space-x-5">
-              <span>{file.name}</span>
-              <span
-                className="text-red-500 cursor-pointer"
-                onClick={() => removeFile(file.name, idx)}
-              >
-                remove
-              </span>
-            </div>
-          ))}
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-7xl p-10 bg-white rounded-xl shadow-xl flex">
+        <div className="w-1/2 pr-8">
+          <h1 className="text-4xl font-bold text-green-800 mb-4">
+            How Healthy is your food?
+          </h1>
+          <h2 className="text-2xl text-green-600 mb-6">Check it out!</h2>
+          <div className="bg-gray-100 rounded-lg p-6">
+            {/* <h3 className="text-xl font-semibold text-gray-800 mb-2">01</h3> */}
+            <p className="text-gray-600">
+              FIND OUT INGREDIENTS AND CALORIES IN AN INSTANT WITH A PHOTO
+            </p>
+          </div>
         </div>
-        {!isCapturing && <button
-        onClick={handleCaptureClick}
-        disabled={isCapturing}
-        className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
-      >
-        Capture Image 
-      </button>}
-      <br />
-      {isCapturing && (
-        <>
-          <video ref={videoRef} autoPlay playsInline className="mt-4 max-w-full max-h-48 rounded shadow-md" />
-          <br />
-          <div className="flex ">
-          <button
-            onClick={handleCaptureImage}
-            className="bg-green-500 text-white  text-xs px-2 py-1 rounded mt-2"
-          >
-            Capture Image
-          </button>
-          <button
-            onClick={handleStopCapture}
-            className="bg-red-500 text-white text-xs px-4 py-2 rounded mt-2 ml-2"
-          >
-            Stop Capture
-          </button>
+
+        <div
+          className="w-1/2 bg-blue-50 rounded-xl p-8 flex flex-col items-center justify-center"
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
+          <div className="text-center mb-6">
+            <CloudUploadIcon style={{ fontSize: 48, color: "#3B82F6" }} />
+            <p className="mt-2 text-blue-600">
+              Drag & Drop files or Select files to upload
+            </p>
           </div>
-        </>
-      )}
-      {isCapturing && (
-        <canvas ref={canvasRef} className="hidden"></canvas>
-      )}
-      {(props.image || files) && (
-        <div className="lg:flex flex-col lg:justify-center items-center">
-          <div className="lg:w-1/2">
-            {props.image &&<img
-              src={props.image}
-              alt="Uploaded"
-              className="mt-4 max-w-full max-h-48 rounded shadow-md"
-            />}
-          </div>
-          <div >
-            
-            <button
-              id="capture"
-              className="text-white px-4 py-2 rounded mt-4 text-xs"
-              onClick={() => {handleUploadClick()}}
+          <input
+            type="file"
+            id="fileInput"
+            className="hidden"
+            ref={inputRef}
+            multiple={true}
+            onChange={handleImageChange}
+            accept=".jpg, .jpeg, .png"
+          />
+          <div className="flex space-x-4">
+            <Button
+              variant="contained"
+              component="label"
+              htmlFor="fileInput"
+              startIcon={<CloudUploadIcon />}
+              className="bg-blue-500 hover:bg-blue-600"
             >
-              Upload
-            </button>
+              Select Files
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<CameraAltIcon />}
+              className="border-blue-500 text-blue-500 hover:bg-blue-50"
+              onClick={handleCaptureClick}
+              disabled={isCapturing}
+            >
+              Capture Image
+            </Button>
           </div>
+
+          {files.length > 0 && (
+            <div className="mt-4 text-center">
+              {files.map((file, idx) => (
+                <div key={idx} className="text-green-600">
+                  <p>File selected: {file.name}</p>
+                  <span
+                    className="text-red-500 cursor-pointer"
+                    onClick={() => removeFile(file.name, idx)}
+                  >
+                    remove
+                  </span>
+                </div>
+              ))}
+              <Button
+                variant="contained"
+                className="mt-2 bg-green-500 hover:bg-green-600"
+                onClick={handleUploadClick}
+              >
+                Upload
+              </Button>
+            </div>
+          )}
+          {isCapturing && (
+            <>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="mt-4 max-w-full max-h-48 rounded shadow-md"
+              />
+              <div className="flex mt-2">
+                <Button
+                  onClick={handleCaptureImage}
+                  className="bg-green-500 text-white text-xs px-2 py-1 rounded mt-2"
+                >
+                  Capture Image
+                </Button>
+                <Button
+                  onClick={handleStopCapture}
+                  className="bg-red-500 text-white text-xs px-4 py-2 rounded mt-2 ml-2"
+                >
+                  Stop Capture
+                </Button>
+              </div>
+              <canvas ref={canvasRef} className="hidden"></canvas>
+            </>
+          )}
         </div>
-      )}
-      </form>
       </div>
     </div>
   );

@@ -1,60 +1,76 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import GoogleLoginButton from '../../components/GoogleLoginButton';
-import { UserAuth } from '../../contexts/AuthContext';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserAuth } from "../../contexts/AuthContext";
+import { Button } from "@mui/material";
+import GoogleIcon from "@mui/icons-material/Google";
+
 
 const Login = () => {
-  const { user } = UserAuth();
+  const { googleSignIn, user } = UserAuth();
   const navigate = useNavigate();
 
+  const handleGoogleSignIn = async() => {
+      try {
+          await googleSignIn();
+      } catch(error) {
+          console.log(error);
+      }
+      navigate('/')
+  };
+
   useEffect(() => {
-    if(user != null) {
-      navigate('/login');
-    }
+      if (user != null) {
+          navigate('/login')
+      }
   }, [user, navigate]);
 
+
   return (
-    <section className="bg-secondary-100 dark:bg-gray-900">
-      <div className="flex flex-col items-center justify-center px-6 pt-20 py-8 mx-auto md:h-screen lg:py-0">
-        
-        <h1 className="flex items-center mb-6 text-6xl font-semibold text-secondary-50 dark:text-white">
-          BiteBalance
-        </h1>
-        <div className="w-full bg-secondary-50 rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-secondary-100 md:text-2xl dark:text-white">
-              Sign in to your account
-            </h1>
-            <form className="space-y-4 md:space-y-6 flex flex-col" action="#">
-              <div>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                <input type="email" name="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@collegename.edu" required autoComplete='email'/>
-              </div>
-              <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                <input type="password" name="password" id="password" placeholder="••••••••" className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input id="remember" aria-describedby="remember" type="checkbox" className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">Remember me</label>
-                  </div>
-                </div>
-                <a href="#" className="text-sm font-medium text-primary-800 hover:underline dark:text-primary-500">Forgot password?</a>
-              </div>
-              <button type="submit" className="w-full text-white bg-secondary-100 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign in</button>
-              <GoogleLoginButton />
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Don't have an account yet? <a href= "/signup" className="font-medium text-secondary-100 hover:underline dark:text-primary-500">Sign up</a>
-              </p>
-            </form>
-          </div>
+    <div className="min-h-screen flex items-center justify-center">
+    <div className="relative w-full max-w-md">
+      {/* Background pattern */}
+      <div 
+        className="absolute inset-0 bg-repeat opacity-10" 
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0c16.569 0 30 13.431 30 30 0 16.569-13.431 30-30 30C13.431 60 0 46.569 0 30 0 13.431 13.431 0 30 0zm-7 15a8 8 0 100 16 8 8 0 000-16zm21 0a8 8 0 100 16 8 8 0 000-16zM15 37a8 8 0 100 16 8 8 0 000-16zm30 0a8 8 0 100 16 8 8 0 000-16z' fill='%2322c55e' fill-opacity='0.2'/%3E%3C/svg%3E")`,
+          backgroundSize: '60px 60px'
+        }}
+      ></div>
+
+      {/* Login container */}
+      <div className="relative bg-white p-8 rounded-lg shadow-lg">
+        <div className="flex items-center justify-center mb-6">
+          <img 
+            src="/Logo.svg" 
+            alt="BiteBalance Logo" 
+            width={40} 
+            height={40} 
+            className="mr-2" 
+          />
+          <h1 className="text-3xl font-bold text-center text-green-700">BiteBalance</h1>
         </div>
+        <h2 className="text-xl text-center text-green-600 mb-8">Sign in to your account</h2>
+        
+        <Button 
+          variant="outlined" 
+          className="w-full py-3 text-lg border-green-500 text-green-700 hover:bg-green-50"
+          onClick={handleGoogleSignIn}
+          startIcon={<GoogleIcon />}
+          sx={{
+            textTransform: 'none',
+            borderColor: '#22c55e',
+            color: '#15803d',
+            '&:hover': {
+              borderColor: '#16a34a',
+              backgroundColor: '#f0fdf4',
+            },
+          }}
+        >
+          Sign in with Google
+        </Button>
       </div>
-    </section>
+    </div>
+  </div>
   );
 };
 
