@@ -42,6 +42,7 @@ export default function Parameters(props) {
   // Generate Recipe
   const generateRecipe = async () => {
     props.setOpen(true)
+    console.log(props.ing)
     try {
        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}generate-recipe`, {
          method: 'POST',
@@ -50,7 +51,7 @@ export default function Parameters(props) {
          },
          body: JSON.stringify({
            dietRestrictions: isVeg ? 'veg' : 'non-veg',
-           ingredients: props.ing, // Assuming ingredients is passed as a prop
+           ingredients: JSON.stringify(props.ing), // Assuming ingredients is passed as a prop
            cooking_time: value,
            people: selectedButton,
            difficulty: selectedProficiency.toLowerCase(),
