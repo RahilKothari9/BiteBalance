@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Box, Card, CardContent, Typography, LinearProgress, Grid } from '@mui/material';
-import { FitnessCenter, Restaurant, Fastfood, WaterDrop, Icecream, Apple } from '@mui/icons-material';
+import { Box, Card, CardContent, Typography, LinearProgress, Grid, Chip } from '@mui/material';
+import { FitnessCenter, Restaurant, Fastfood, WaterDrop, Icecream, Apple, TipsAndUpdates } from '@mui/icons-material';
 import axios from 'axios';
+import { analyzeNutrition, generateEducationalFacts } from '../utils/nutritionAnalysis';
 
 const Dashboard = ({ userId }) => {
   const [nutritionStats, setNutritionStats] = useState([]);
   const [calorieHistory, setCalorieHistory] = useState([]);
+  const [dailyInsights, setDailyInsights] = useState(null);
 
   // Fetch the data from your backend
   const fetchUserData = async () => {
@@ -23,6 +25,20 @@ const Dashboard = ({ userId }) => {
           { name: 'Sugars', value: totalSugars, icon: <Icecream />, color: 'pink', max: 150 },
           { name: 'Fats', value: totalFats, icon: <Apple />, color: 'green', max: 180 },
         ]);
+
+        // Generate daily insights
+        const dailyNutritionData = {
+          calories: totalCalories,
+          protein: totalProtein,
+          carbs: totalCarbs,
+          sugars: totalSugars,
+          fats: totalFats,
+          sodium: totalSodium
+        };
+        
+        const analysis = analyzeNutrition(dailyNutritionData);
+        const facts = generateEducationalFacts(dailyNutritionData);
+        setDailyInsights({ analysis, facts });
       }
 
       // Fetch calorie history (last 3 days)
@@ -92,6 +108,66 @@ const Dashboard = ({ userId }) => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Daily Insights Card */}
+      {dailyInsights && (
+        <Card sx={{ mt: 3 }}>
+          <CardContent>
+            <Typography variant="h6" component="div" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <TipsAndUpdates color="primary" />
+              Today's Nutrition Insights
+            </Typography>
+            
+            {/* Health Score and Grade */}
+            <Box display="flex" alignItems="center" gap={2} mb={2}>
+              <Typography variant="body1">
+                Overall Health Score: <strong>{dailyInsights.analysis.healthScore}/100</strong>
+              </Typography>
+              <Chip 
+                label={`Grade: ${dailyInsights.analysis.healthGrade}`}
+                color={dailyInsights.analysis.healthGrade === 'A' ? 'success' : 
+                       dailyInsights.analysis.healthGrade === 'B' ? 'primary' : 
+                       dailyInsights.analysis.healthGrade === 'C' ? 'warning' : 'error'}
+                variant="contained"
+              />
+            </Box>
+
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              {dailyInsights.analysis.overallMessage}
+            </Typography>
+
+            {/* Positive aspects and concerns */}
+            <Box mb={2}>
+              <Grid container spacing={1}>
+                {dailyInsights.analysis.positives.map((positive, index) => (
+                  <Grid item key={index}>
+                    <Chip label={positive} color="success" size="small" />
+                  </Grid>
+                ))}
+                {dailyInsights.analysis.concerns.map((concern, index) => (
+                  <Grid item key={index}>
+                    <Chip label={concern} color="warning" size="small" />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+
+            {/* Educational fact */}
+            {dailyInsights.facts.length > 0 && (
+              <Box sx={{ 
+                backgroundColor: '#e8f5e8', 
+                p: 2, 
+                borderRadius: 1,
+                borderLeft: '4px solid #4caf50'
+              }}>
+                <Typography variant="body2">
+                  {dailyInsights.facts[0]}
+                </Typography>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </Box>
   );
 };
