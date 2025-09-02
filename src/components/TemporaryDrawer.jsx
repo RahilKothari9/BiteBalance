@@ -7,10 +7,14 @@ import { grey } from '@mui/material/colors';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { Button } from '@mui/material';
+import { Button, IconButton, Tooltip } from '@mui/material';
+import { TipsAndUpdates as InsightsIcon, Lightbulb as AlternativesIcon } from '@mui/icons-material';
 import axios from 'axios';  // Use axios for API calls
 import '../css/drawer.css';
 import { UserAuth } from '../contexts/AuthContext';
+import FoodInsights from './FoodInsights';
+import AlternativesSuggestions from './AlternativesSuggestions';
+import SeasonalRecommendations from './SeasonalRecommendations';
 const drawerBleeding = 50;
 
 const Root = styled('div')(({ theme }) => ({
@@ -54,6 +58,7 @@ const updateTotalCalories = async (userId, calories, protein, sugar, carbs, fat,
 function SwipeableEdgeDrawer(props) {
   const { window } = props;
   const [open, setOpen] = React.useState(false);
+  const [showAlternatives, setShowAlternatives] = React.useState(false);
   const { user } = UserAuth();
   // console.log(user)
   const userId = user.uid; // Replace this with your user ID management
@@ -100,21 +105,45 @@ function SwipeableEdgeDrawer(props) {
       <div className='flex flex-col items-center justify-center w-90 p-4 mt-4 bg-blue-50'>
         <img src={props.image} className="h-64 mt-4 mb-4 object-cover" alt={recipe.name} />
         <h1 className="text-2xl font-bold mb-4">{recipe.name}</h1>
-        <Button 
-          onClick={() => {
-            const caloriesAsNumber = parseFloat(recipe.calories);
-            const proteinAsNumber = parseFloat(recipe.protein);
-            const sugarAsNumber = parseFloat(recipe.sugars);
-            const carbsAsNumber = parseFloat(recipe.carbs);
-            const fatAsNumber = parseFloat(recipe.fats);
-            const sodiumAsNumber = parseFloat(recipe.sodium);
+        
+        {/* Action buttons row */}
+        <Box display="flex" gap={2} mb={3} flexWrap="wrap" justifyContent="center">
+          <Button 
+            onClick={() => {
+              const caloriesAsNumber = parseFloat(recipe.calories);
+              const proteinAsNumber = parseFloat(recipe.protein);
+              const sugarAsNumber = parseFloat(recipe.sugars);
+              const carbsAsNumber = parseFloat(recipe.carbs);
+              const fatAsNumber = parseFloat(recipe.fats);
+              const sodiumAsNumber = parseFloat(recipe.sodium);
 
-            updateTotalCalories(userId, caloriesAsNumber, proteinAsNumber, sugarAsNumber, carbsAsNumber, fatAsNumber, sodiumAsNumber);
-          }}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Eat
-        </Button>
+              updateTotalCalories(userId, caloriesAsNumber, proteinAsNumber, sugarAsNumber, carbsAsNumber, fatAsNumber, sodiumAsNumber);
+            }}
+            variant="contained"
+            color="primary"
+            sx={{ minWidth: 100 }}
+          >
+            Eat
+          </Button>
+          
+          <Tooltip title="See healthier alternatives">
+            <Button
+              onClick={() => setShowAlternatives(true)}
+              variant="outlined"
+              color="secondary"
+              startIcon={<AlternativesIcon />}
+              sx={{ minWidth: 120 }}
+            >
+              Alternatives
+            </Button>
+          </Tooltip>
+        </Box>
+
+        {/* Food Insights Component */}
+        <FoodInsights nutritionData={recipe} />
+        
+        {/* Seasonal Recommendations Component */}
+        <SeasonalRecommendations currentIngredients={[recipe.name]} />
       </div>
       <div onClick={toggleDrawer(!open)}>
       <SwipeableDrawer
@@ -170,6 +199,13 @@ function SwipeableEdgeDrawer(props) {
         </StyledBox>
       </SwipeableDrawer>
       </div>
+      
+      {/* Alternatives Dialog */}
+      <AlternativesSuggestions 
+        open={showAlternatives}
+        onClose={() => setShowAlternatives(false)}
+        nutritionData={recipe}
+      />
     </Root>
   );
 }
