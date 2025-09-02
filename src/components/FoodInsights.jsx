@@ -11,7 +11,8 @@ import {
   Grid,
   CircularProgress,
   Tooltip,
-  IconButton
+  IconButton,
+  Divider
 } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -19,9 +20,11 @@ import {
   Favorite as HeartIcon,
   Warning as WarningIcon,
   Info as InfoIcon,
-  Psychology as InsightIcon
+  Psychology as InsightIcon,
+  Visibility as VisibilityIcon
 } from '@mui/icons-material';
 import { analyzeNutrition, generateEducationalFacts } from '../utils/nutritionAnalysis';
+import NutritionQualityIndicator from './NutritionQualityIndicator';
 
 const FoodInsights = ({ nutritionData }) => {
   const [expanded, setExpanded] = useState(false);
@@ -146,6 +149,58 @@ const FoodInsights = ({ nutritionData }) => {
             </Box>
           </Box>
         )}
+
+        {/* Visual Nutrition Quality Indicators */}
+        <Accordion 
+          expanded={expanded === 'quality'} 
+          onChange={handleAccordionChange('quality')}
+          sx={{ backgroundColor: 'transparent', boxShadow: 'none' }}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="body1" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <VisibilityIcon />
+              Nutrition Quality Breakdown
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Box sx={{ backgroundColor: 'white', p: 2, borderRadius: 1 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <NutritionQualityIndicator
+                    label="Sodium"
+                    value={nutritionData.sodium}
+                    max={400}
+                    unit="mg"
+                    color="auto"
+                  />
+                  <NutritionQualityIndicator
+                    label="Sugar"
+                    value={nutritionData.sugars}
+                    max={15}
+                    unit="g"
+                    color="auto"
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <NutritionQualityIndicator
+                    label="Calories"
+                    value={nutritionData.calories}
+                    max={400}
+                    unit=""
+                    color="auto"
+                  />
+                  <NutritionQualityIndicator
+                    label="Total Fats"
+                    value={nutritionData.fats}
+                    max={15}
+                    unit="g"
+                    color="auto"
+                  />
+                </Grid>
+              </Grid>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
 
         {/* Detailed Insights */}
         <Accordion 
