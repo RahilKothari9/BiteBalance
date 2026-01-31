@@ -1,5 +1,4 @@
 import React from 'react';
-import '../css/home.css'
 
 const Box = ({ page, imageSrc, altText, title, description }) => {
   const loadPage = () => {

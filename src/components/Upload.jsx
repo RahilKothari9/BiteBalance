@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { Button } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import "../css/upload.css";
 
 export default function Upload(props) {
   const [dragActive, setDragActive] = useState(false);
