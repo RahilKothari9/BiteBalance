@@ -1,35 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;1,200;1,300&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-/* 
-::-webkit-scrollbar {
-    width: 10px;
-} */
+/* =============================================================================
+   BiteBalance Entry Point
+   Imports the new design system from src/styles
+   ============================================================================= */
 
-::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 5px;
-}
- 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-body{
-  font-family: 'Kanit', sans-serif;
-  background-image: url('/bg3.png');
-  /* max-width: 97vw; */
-  /* max-height: 98vh; */
-  /* margin: auto; */
-}
-
-html{
-  overflow-x: hidden;
-}
-
-
+@import './styles/index.css';

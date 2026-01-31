@@ -1,0 +1,161 @@
+/* =============================================================================
+   BiteBalance Styles Entry Point
+   ============================================================================= */
+
+/* Design Tokens */
+@import './variables.css';
+
+/* Base Styles & Reset */
+@import './base.css';
+
+/* Animation System */
+@import './animations.css';
+
+/* Tailwind Layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================================
+   Component Layer Overrides
+   ============================================================================= */
+
+@layer components {
+  /* Card Base */
+  .card {
+    @apply bg-white rounded-xl shadow-md transition-interactive;
+  }
+
+  .card:hover {
+    @apply shadow-xl;
+    transform: translateY(-4px);
+  }
+
+  /* Button Base */
+  .btn {
+    @apply inline-flex items-center justify-center font-semibold rounded-lg transition-interactive;
+    font-family: var(--font-body);
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Input Base */
+  .input {
+    @apply w-full px-4 py-3 bg-white border border-gray-300 rounded-lg;
+    @apply transition-colors focus:border-coral focus:ring-coral;
+  }
+
+  /* Section Spacing */
+  .section {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Page Header */
+  .page-header {
+    @apply mb-8 md:mb-12;
+  }
+
+  .page-title {
+    @apply text-3xl md:text-4xl font-extrabold text-charcoal mb-2;
+    font-family: var(--font-display);
+  }
+
+  .page-subtitle {
+    @apply text-lg text-warm-gray;
+  }
+}
+
+/* =============================================================================
+   Gradient Blobs
+   ============================================================================= */
+
+.blob {
+  position: absolute;
+  filter: blur(60px);
+  opacity: 0.5;
+  pointer-events: none;
+  animation: float 10s var(--ease-in-out) infinite, blobMorph 15s var(--ease-in-out) infinite;
+}
+
+.blob-coral {
+  background: var(--gradient-coral);
+}
+
+.blob-teal {
+  background: var(--gradient-teal);
+}
+
+.blob-gold {
+  background: var(--gradient-gold);
+}
+
+/* Smaller blobs for cards */
+.blob-sm {
+  width: 150px;
+  height: 150px;
+  filter: blur(40px);
+  opacity: 0.6;
+}
+
+/* Large background blobs */
+.blob-lg {
+  width: 400px;
+  height: 400px;
+  filter: blur(80px);
+  opacity: 0.3;
+}
+
+/* =============================================================================
+   Custom Utilities
+   ============================================================================= */
+
+@layer utilities {
+  /* Gradient Text */
+  .text-gradient-coral {
+    background: var(--gradient-coral);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-teal {
+    background: var(--gradient-teal);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Backdrop Blur */
+  .backdrop-blur-nav {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Custom shadows using CSS vars */
+  .shadow-glow-coral {
+    box-shadow: var(--shadow-glow-coral);
+  }
+
+  .shadow-glow-teal {
+    box-shadow: var(--shadow-glow-teal);
+  }
+
+  .shadow-glow-gold {
+    box-shadow: var(--shadow-glow-gold);
+  }
+
+  /* Focus rings */
+  .ring-coral {
+    box-shadow: var(--ring-coral);
+  }
+
+  .ring-teal {
+    box-shadow: var(--ring-teal);
+  }
+}
