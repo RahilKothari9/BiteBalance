@@ -25,3 +25,6 @@ dist-ssr
 
 .env
 ./DS_Store
+
+# Server data storage
+server/data/

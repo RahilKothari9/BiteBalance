@@ -1,13 +1,24 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Data directory for JSON storage
+const DATA_DIR = path.join(__dirname, 'data');
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 
 // Middleware
 app.use(cors());
@@ -16,44 +27,35 @@ app.use(express.json({ limit: '50mb' }));
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bitebalance')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
-
 // =============================================================================
-// MongoDB Schemas
+// JSON File Storage Helpers
 // =============================================================================
 
-const nutritionEntrySchema = new mongoose.Schema({
-  date: { type: String, required: true },
-  mealType: { type: String, enum: ['breakfast', 'lunch', 'dinner', 'snack'], default: 'snack' },
-  foodName: { type: String },
-  calories: { type: Number, default: 0 },
-  protein: { type: Number, default: 0 },
-  carbs: { type: Number, default: 0 },
-  fat: { type: Number, default: 0 },
-  fiber: { type: Number, default: 0 },
-  sugar: { type: Number, default: 0 },
-  sodium: { type: Number, default: 0 },
-  imageUrl: { type: String },
-  createdAt: { type: Date, default: Date.now }
-});
+function getUserDataPath(userId) {
+  return path.join(DATA_DIR, `user_${userId}.json`);
+}
 
-const userCaloriesSchema = new mongoose.Schema({
-  userId: { type: String, required: true, index: true },
-  entries: [nutritionEntrySchema],
-  dailySummaries: [{
-    date: { type: String, required: true },
-    totalCalories: { type: Number, default: 0 },
-    totalProtein: { type: Number, default: 0 },
-    totalCarbs: { type: Number, default: 0 },
-    totalFat: { type: Number, default: 0 },
-    mealCount: { type: Number, default: 0 }
-  }]
-});
+function readUserData(userId) {
+  const filePath = getUserDataPath(userId);
+  if (fs.existsSync(filePath)) {
+    const data = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(data);
+  }
+  return {
+    userId,
+    entries: [],
+    dailySummaries: []
+  };
+}
 
-const UserCalories = mongoose.model('UserCalories', userCaloriesSchema);
+function writeUserData(userId, data) {
+  const filePath = getUserDataPath(userId);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
+
+function generateEntryId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+}
 
 // =============================================================================
 // AI Helper Functions
@@ -61,7 +63,7 @@ const UserCalories = mongoose.model('UserCalories', userCaloriesSchema);
 
 async function analyzeImageWithGemini(base64Image, prompt) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     // Remove data URL prefix if present
     const imageData = base64Image.replace(/^data:image\/\w+;base64,/, '');
@@ -85,7 +87,7 @@ async function analyzeImageWithGemini(base64Image, prompt) {
 
 async function generateTextWithGemini(prompt) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const result = await model.generateContent(prompt);
     return result.response.text();
   } catch (error) {
@@ -100,7 +102,7 @@ async function generateTextWithGemini(prompt) {
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ status: 'ok', message: 'BiteBalance API Server' });
+  res.json({ status: 'ok', message: 'BiteBalance API Server (JSON Storage)' });
 });
 
 // -----------------------------------------------------------------------------
@@ -275,28 +277,17 @@ Create a delicious, practical recipe that can realistically be made with the giv
 // -----------------------------------------------------------------------------
 // GET /calories/:userId - Get calorie/nutrition data for a user
 // -----------------------------------------------------------------------------
-app.get('/calories/:userId', async (req, res) => {
+app.get('/calories/:userId', (req, res) => {
   try {
     const { userId } = req.params;
     const { date } = req.query;
 
-    let userCalories = await UserCalories.findOne({ userId });
-
-    if (!userCalories) {
-      return res.json({
-        totalCalories: 0,
-        totalProtein: 0,
-        totalCarbs: 0,
-        totalFat: 0,
-        mealCount: 0,
-        entries: []
-      });
-    }
+    const userData = readUserData(userId);
 
     if (date) {
       // Get data for specific date
-      const dailySummary = userCalories.dailySummaries.find(s => s.date === date);
-      const dayEntries = userCalories.entries.filter(e => e.date === date);
+      const dailySummary = userData.dailySummaries.find(s => s.date === date);
+      const dayEntries = userData.entries.filter(e => e.date === date);
 
       return res.json({
         totalCalories: dailySummary?.totalCalories || 0,
@@ -309,7 +300,7 @@ app.get('/calories/:userId', async (req, res) => {
     }
 
     // Return all data if no date specified
-    res.json(userCalories);
+    res.json(userData);
   } catch (error) {
     console.error('Error in /calories/:userId:', error);
     res.status(500).json({ error: 'Failed to fetch calorie data' });
@@ -319,25 +310,15 @@ app.get('/calories/:userId', async (req, res) => {
 // -----------------------------------------------------------------------------
 // GET /ycalories/:userId - Get yearly/historical calorie data
 // -----------------------------------------------------------------------------
-app.get('/ycalories/:userId', async (req, res) => {
+app.get('/ycalories/:userId', (req, res) => {
   try {
     const { userId } = req.params;
     const { date } = req.query;
 
-    let userCalories = await UserCalories.findOne({ userId });
-
-    if (!userCalories) {
-      return res.json({
-        totalCalories: 0,
-        totalProtein: 0,
-        totalCarbs: 0,
-        totalFat: 0,
-        entries: []
-      });
-    }
+    const userData = readUserData(userId);
 
     if (date) {
-      const dayEntries = userCalories.entries.filter(e => e.date === date);
+      const dayEntries = userData.entries.filter(e => e.date === date);
       const totals = dayEntries.reduce((acc, entry) => ({
         totalCalories: acc.totalCalories + (entry.calories || 0),
         totalProtein: acc.totalProtein + (entry.protein || 0),
@@ -351,7 +332,7 @@ app.get('/ycalories/:userId', async (req, res) => {
       });
     }
 
-    res.json(userCalories.dailySummaries);
+    res.json(userData.dailySummaries);
   } catch (error) {
     console.error('Error in /ycalories/:userId:', error);
     res.status(500).json({ error: 'Failed to fetch calorie data' });
@@ -361,7 +342,7 @@ app.get('/ycalories/:userId', async (req, res) => {
 // -----------------------------------------------------------------------------
 // POST /calories/update - Add/update calorie entry
 // -----------------------------------------------------------------------------
-app.post('/calories/update', async (req, res) => {
+app.post('/calories/update', (req, res) => {
   try {
     const { userId, calories, protein, carbs, fat, fiber, sugar, sodium, foodName, mealType } = req.body;
 
@@ -371,15 +352,12 @@ app.post('/calories/update', async (req, res) => {
 
     const today = new Date().toISOString().split('T')[0];
 
-    // Find or create user document
-    let userCalories = await UserCalories.findOne({ userId });
-
-    if (!userCalories) {
-      userCalories = new UserCalories({ userId, entries: [], dailySummaries: [] });
-    }
+    // Read existing data
+    const userData = readUserData(userId);
 
     // Add new entry
     const newEntry = {
+      id: generateEntryId(),
       date: today,
       mealType: mealType || 'snack',
       foodName: foodName || 'Meal',
@@ -389,44 +367,44 @@ app.post('/calories/update', async (req, res) => {
       fat: fat || 0,
       fiber: fiber || 0,
       sugar: sugar || 0,
-      sodium: sodium || 0
+      sodium: sodium || 0,
+      createdAt: new Date().toISOString()
     };
 
-    userCalories.entries.push(newEntry);
+    userData.entries.push(newEntry);
 
     // Update daily summary
-    let dailySummary = userCalories.dailySummaries.find(s => s.date === today);
+    let summaryIndex = userData.dailySummaries.findIndex(s => s.date === today);
 
-    if (!dailySummary) {
-      dailySummary = {
+    if (summaryIndex === -1) {
+      userData.dailySummaries.push({
         date: today,
         totalCalories: 0,
         totalProtein: 0,
         totalCarbs: 0,
         totalFat: 0,
         mealCount: 0
-      };
-      userCalories.dailySummaries.push(dailySummary);
+      });
+      summaryIndex = userData.dailySummaries.length - 1;
     }
 
-    // Find the summary in array and update
-    const summaryIndex = userCalories.dailySummaries.findIndex(s => s.date === today);
-    userCalories.dailySummaries[summaryIndex] = {
-      ...userCalories.dailySummaries[summaryIndex],
-      totalCalories: (userCalories.dailySummaries[summaryIndex].totalCalories || 0) + (calories || 0),
-      totalProtein: (userCalories.dailySummaries[summaryIndex].totalProtein || 0) + (protein || 0),
-      totalCarbs: (userCalories.dailySummaries[summaryIndex].totalCarbs || 0) + (carbs || 0),
-      totalFat: (userCalories.dailySummaries[summaryIndex].totalFat || 0) + (fat || 0),
-      mealCount: (userCalories.dailySummaries[summaryIndex].mealCount || 0) + 1
+    userData.dailySummaries[summaryIndex] = {
+      ...userData.dailySummaries[summaryIndex],
+      totalCalories: (userData.dailySummaries[summaryIndex].totalCalories || 0) + (calories || 0),
+      totalProtein: (userData.dailySummaries[summaryIndex].totalProtein || 0) + (protein || 0),
+      totalCarbs: (userData.dailySummaries[summaryIndex].totalCarbs || 0) + (carbs || 0),
+      totalFat: (userData.dailySummaries[summaryIndex].totalFat || 0) + (fat || 0),
+      mealCount: (userData.dailySummaries[summaryIndex].mealCount || 0) + 1
     };
 
-    await userCalories.save();
+    // Save to file
+    writeUserData(userId, userData);
 
     res.json({
       success: true,
       message: 'Calorie data updated',
       entry: newEntry,
-      dailySummary: userCalories.dailySummaries[summaryIndex]
+      dailySummary: userData.dailySummaries[summaryIndex]
     });
   } catch (error) {
     console.error('Error in /calories/update:', error);
@@ -437,14 +415,14 @@ app.post('/calories/update', async (req, res) => {
 // -----------------------------------------------------------------------------
 // GET /stats/:userId - Get comprehensive stats for a user
 // -----------------------------------------------------------------------------
-app.get('/stats/:userId', async (req, res) => {
+app.get('/stats/:userId', (req, res) => {
   try {
     const { userId } = req.params;
     const { days = 7 } = req.query;
 
-    let userCalories = await UserCalories.findOne({ userId });
+    const userData = readUserData(userId);
 
-    if (!userCalories) {
+    if (!userData.entries || userData.entries.length === 0) {
       return res.json({
         weeklyData: [],
         averages: { calories: 0, protein: 0, carbs: 0, fat: 0 },
@@ -462,7 +440,7 @@ app.get('/stats/:userId', async (req, res) => {
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
 
-      const summary = userCalories.dailySummaries.find(s => s.date === dateStr);
+      const summary = userData.dailySummaries.find(s => s.date === dateStr);
       weeklyData.push({
         date: dateStr,
         dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
@@ -497,7 +475,7 @@ app.get('/stats/:userId', async (req, res) => {
       weeklyData: weeklyData.reverse(),
       averages,
       streak,
-      totalMeals: userCalories.entries.length
+      totalMeals: userData.entries.length
     });
   } catch (error) {
     console.error('Error in /stats/:userId:', error);
@@ -508,36 +486,34 @@ app.get('/stats/:userId', async (req, res) => {
 // -----------------------------------------------------------------------------
 // DELETE /calories/:userId/entry/:entryId - Delete a specific entry
 // -----------------------------------------------------------------------------
-app.delete('/calories/:userId/entry/:entryId', async (req, res) => {
+app.delete('/calories/:userId/entry/:entryId', (req, res) => {
   try {
     const { userId, entryId } = req.params;
 
-    const userCalories = await UserCalories.findOne({ userId });
+    const userData = readUserData(userId);
 
-    if (!userCalories) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const entryIndex = userCalories.entries.findIndex(e => e._id.toString() === entryId);
+    const entryIndex = userData.entries.findIndex(e => e.id === entryId);
 
     if (entryIndex === -1) {
       return res.status(404).json({ error: 'Entry not found' });
     }
 
-    const entry = userCalories.entries[entryIndex];
+    const entry = userData.entries[entryIndex];
 
     // Update daily summary
-    const summaryIndex = userCalories.dailySummaries.findIndex(s => s.date === entry.date);
+    const summaryIndex = userData.dailySummaries.findIndex(s => s.date === entry.date);
     if (summaryIndex !== -1) {
-      userCalories.dailySummaries[summaryIndex].totalCalories -= entry.calories || 0;
-      userCalories.dailySummaries[summaryIndex].totalProtein -= entry.protein || 0;
-      userCalories.dailySummaries[summaryIndex].totalCarbs -= entry.carbs || 0;
-      userCalories.dailySummaries[summaryIndex].totalFat -= entry.fat || 0;
-      userCalories.dailySummaries[summaryIndex].mealCount -= 1;
+      userData.dailySummaries[summaryIndex].totalCalories -= entry.calories || 0;
+      userData.dailySummaries[summaryIndex].totalProtein -= entry.protein || 0;
+      userData.dailySummaries[summaryIndex].totalCarbs -= entry.carbs || 0;
+      userData.dailySummaries[summaryIndex].totalFat -= entry.fat || 0;
+      userData.dailySummaries[summaryIndex].mealCount -= 1;
     }
 
-    userCalories.entries.splice(entryIndex, 1);
-    await userCalories.save();
+    userData.entries.splice(entryIndex, 1);
+
+    // Save to file
+    writeUserData(userId, userData);
 
     res.json({ success: true, message: 'Entry deleted' });
   } catch (error) {
@@ -546,8 +522,37 @@ app.delete('/calories/:userId/entry/:entryId', async (req, res) => {
   }
 });
 
+// -----------------------------------------------------------------------------
+// GET /entries/:userId - Get all entries for a user (with optional date filter)
+// -----------------------------------------------------------------------------
+app.get('/entries/:userId', (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { date, limit = 50 } = req.query;
+
+    const userData = readUserData(userId);
+
+    let entries = userData.entries;
+
+    if (date) {
+      entries = entries.filter(e => e.date === date);
+    }
+
+    // Sort by createdAt descending and limit
+    entries = entries
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, parseInt(limit));
+
+    res.json({ entries });
+  } catch (error) {
+    console.error('Error in /entries/:userId:', error);
+    res.status(500).json({ error: 'Failed to fetch entries' });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`BiteBalance API Server running on port ${PORT}`);
+  console.log(`Using JSON file storage in: ${DATA_DIR}`);
   console.log(`Health check: http://localhost:${PORT}/`);
 });
