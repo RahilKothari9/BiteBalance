@@ -241,6 +241,136 @@
   }
 }
 
+/* Bounce In - For success states */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pulse Subtle - Gentle attention */
+@keyframes pulseSlight {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+}
+
+/* Wiggle - For interactive hints */
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
+/* Slide Up Fade */
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pop */
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Glow Pulse */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(232, 93, 76, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 10px rgba(232, 93, 76, 0.1);
+  }
+}
+
+/* Ripple */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Progress Bar */
+@keyframes progressBar {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--progress-width, 100%);
+  }
+}
+
+/* Fade In */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Number Tick */
+@keyframes numberTick {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  51% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Animation Utility Classes
    --------------------------------------------------------------------------- */
@@ -296,6 +426,38 @@
 
 .animate-shake {
   animation: shake 0.5s var(--ease-out);
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.6s var(--ease-bounce) forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSlight 2s var(--ease-in-out) infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 0.3s var(--ease-out);
+}
+
+.animate-pop {
+  animation: pop 0.3s var(--ease-bounce);
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 2s var(--ease-in-out) infinite;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.3s var(--ease-out) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s var(--ease-out) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.4s var(--ease-out) forwards;
 }
 
 /* ---------------------------------------------------------------------------

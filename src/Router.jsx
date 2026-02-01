@@ -18,6 +18,9 @@ import Recs from "./pages/Recs";
 import Stats from "./pages/Stats";
 import Tracker from "./pages/Tracker";
 import Endproduct from "./pages/Endproduct";
+import History from "./pages/History";
+import Goals from "./pages/Goals";
+import QuickLog from "./pages/QuickLog";
 
 export const Router = () => {
     const location = useLocation();
@@ -48,6 +51,10 @@ export const Router = () => {
                 <Route path="/tracker" element={<Tracker />} /> 
                 <Route path="/rec" element={<Recs/>}/>
                 <Route path="/endproduct" element={<Endproduct />} />
+                <Route path="/track" element={<Endproduct />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/goals" element={<Goals />} />
+                <Route path="/quick" element={<QuickLog />} />
             </Routes>
         </>
     );

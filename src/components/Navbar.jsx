@@ -6,8 +6,11 @@ import Logo from "../assets/Logo.svg";
 
 const navLinks = [
   { name: "Home", path: "/" },
-  { name: "Meal Tracking", path: "/endproduct" },
+  { name: "Track", path: "/track" },
+  { name: "Quick Log", path: "/quick" },
   { name: "Recipes", path: "/ingredients" },
+  { name: "Goals", path: "/goals" },
+  { name: "History", path: "/history" },
   { name: "Stats", path: "/stats" },
 ];
 
